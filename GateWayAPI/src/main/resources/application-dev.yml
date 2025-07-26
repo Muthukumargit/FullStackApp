@@ -1,0 +1,38 @@
+server:
+  port: 20000
+#  address: 0.0.0.0
+
+spring:
+  application:
+    name: GatewayApi
+
+  web:
+    resources:
+      add-mappings: false  # Disable serving static resources from /static
+
+  cloud:
+    gateway:
+      routes:
+        - id: react-ui
+          uri: http://localhost:5173
+          predicates:
+            - Path=/UI/**
+          filters:
+            - RewritePath=/(?<segment>.*), /${segment}
+
+        - id: user-service
+          uri: http://localhost:8080
+          predicates:
+            - Path=/userservice/**
+          filters:
+            - StripPrefix=1
+
+oracle:
+  datasource:
+    jdbcUrl: ${db.dev.url}
+    username: ${db.dev.username}
+    password: ${db.dev.password}
+    driver-class-name: oracle.jdbc.OracleDriver
+
+JWT:
+  KEY: ${jwt.key}

@@ -1,0 +1,109 @@
+.user-dropdown-container {
+  /* position: relative; */
+  display: inline-block;
+}
+
+.user-icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.user-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: whitesmoke;
+}
+
+/* Dropdown Panel */
+.dropdown-panel {
+  /* position: absolute;
+  top: 120px;
+  right: 0;
+  width: 250px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  animation: fadeIn 0.2s ease-out; */
+
+  position: fixed;
+    top: 50px;
+    right: 0;
+    width: 250px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 5000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* User Info */
+.user-info {
+  padding: 16px;
+  line-height: 25px;
+      white-space: nowrap;
+}
+
+.user-name {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.user-email {
+  color: #666;
+  font-size: 0.9em;
+  margin-top: 4px;
+}
+
+/* Logout Button */
+.logout-section {
+  padding: 16px;
+}
+
+.logout-button {
+  width: 100%;
+  padding: 10px;
+  background-color:#4b2be2; /* blueviolet; #007bff;*/
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.logout-button:hover {
+  background-color: blueviolet;
+}
+
+/* Optional Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fade {
+    
+}
+
+.user-icon{
+  display: flex;
+    justify-content: end;
+    align-items: center;
+    position: absolute;
+    right: 25px;
+    bottom: 0;
+    top: 10px;
+    font-size: x-large;
+    /* left: 0; */
+    gap: 20px;
+}

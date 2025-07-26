@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: Userservice
+    
+server:
+  port: 8080
+  address: 0.0.0.0
+oracle:
+ datasource:
+  jdbcUrl: ${db.url}
+  username: ${db.username}
+  password: ${db.password}
+  driver-class-name: oracle.jdbc.OracleDriver

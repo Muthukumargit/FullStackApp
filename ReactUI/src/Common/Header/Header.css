@@ -1,0 +1,23 @@
+/* .header-content h2{
+    display: flex;
+    background-color:#4b2be2; 
+    min-height: 3rem;
+    color: white;
+    padding: 0;
+    justify-content: center;
+    margin: 0;
+    align-items: center;
+    position: static;
+} */
+
+.header-content{
+    display: flex;
+    background-color:#4b2be2;
+     min-height: 3rem;
+    color: white;
+    padding: 0;
+    justify-content: center;
+    margin: 0;
+    align-items: center;
+    position: static;
+}

@@ -1,0 +1,42 @@
+server:
+  port: 20000
+  address: 0.0.0.0
+
+spring:
+  application:
+    name: GatewayApi
+
+  web:
+    resources:
+      static-locations:
+        - classpath:/static/
+      add-mappings: true  # Enable serving from /static
+
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: https://reactapp-userservice.onrender.com
+          predicates:
+            - Path=/userservice/**
+          filters:
+            - StripPrefix=1
+            - name: Retry
+              args:
+               retries: 3
+               statuses: BAD_GATEWAY
+               methods: GET, POST
+               backoff:
+                firstBackoff: 2s
+                maxBackoff: 10s
+                factor: 2
+
+oracle:
+  datasource:
+    jdbcUrl: ${db.url}
+    username: ${db.username}
+    password: ${db.password}
+    driver-class-name: oracle.jdbc.OracleDriver
+
+JWT:
+  KEY: ${jwt.key}

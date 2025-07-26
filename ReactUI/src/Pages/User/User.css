@@ -1,0 +1,187 @@
+.user-content{
+    display: flex;
+    justify-content: center;
+    margin-top: 25px;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-main{
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+}
+
+.taskselect-area{
+    display: flex;
+    flex-direction: row;
+    min-height: 100px;
+    /* background-color: aliceblue;
+    margin-top: 15px;
+    border-radius: 20px; */
+    justify-content: center;
+    gap: 20px;
+    padding: 15px;
+   overflow-x: auto;  /* ⬅ change this */
+  overflow-y: hidden; /* ⬅ optional: to prevent vertical scroll bar */
+}
+.taskselect-main{
+  background-color: aliceblue;
+    margin-top: 15px;
+    border-radius: 20px;
+    gap: 20px;
+}
+.button-area{
+display: flex;
+flex-direction: row;
+justify-content: center;
+gap: 20px;
+}
+.available-task{
+    border: 2px solid lightgray;
+    /* min-width: 10rem; */
+    min-height: 185px;
+    max-height: 190px;
+    margin: 10px;
+    border-radius: 20px;
+    overflow-x: auto;
+    overflow-y: scroll;
+    background-color: #f5f5f5;
+    min-width: 220px;
+    
+}
+.selected-task{
+    border: 2px solid lightgray;
+    /* min-width: 10rem; */
+    min-height: 185px;
+    max-height: 190px;
+    margin: 10px;
+    border-radius: 20px;
+    overflow-x: auto;
+    overflow-y: scroll;
+    background-color: #f5f5f5;
+    min-width: 220px;
+}
+.select-button-area{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 10px;
+    justify-content: center;
+}
+/* .selected-item{
+    background-color: ;
+} */
+.available-task .selected-item{
+    background-color: blue;
+    color: white;
+    margin-bottom: 1px;
+        /* margin: 1px 0px; */
+}   
+.selected-task .selected-item{
+    background-color: blue;
+    color: white;
+    margin-bottom: 1px;
+        /* margin: 1px 0px; */
+}
+.available-item{
+    margin-bottom: 2px;
+}
+.selected-task .available-item.selected-item:hover{
+    background-color: blue;
+    color: white;
+        /* margin: 1px 0px; */
+}
+
+.available-task .available-item.selected-item:hover{
+    color: white;
+    background-color: blue;
+}
+.available-task .available-item:hover{
+    color: black;
+    background-color: #5133e0d1;
+}
+/* .available-task .available-item:hover{
+    color: black;
+    background-color: #5133e0d1;
+} */
+
+.selected-task .available-item:hover{
+    color: black;
+    background-color: #5133e0d1;
+}
+
+.item-area{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+@media (max-width: 768px) {
+    .taskselect-area{
+        justify-content: space-around;
+    }
+}
+
+.role-manage-area{
+   display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.user-role-area{
+    display: flex;
+    flex-direction: column;
+    justify-content:center ;
+}
+.chip-area{
+    display: flex;
+    flex-direction: row;
+    /* justify-content: center;*/
+    align-items: center; 
+    gap: 10px;
+}
+.chip-area h3 {
+   display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+}
+.user-role-select{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    /* align-items: center; */
+}
+.manage-role-button{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+}
+.add-role-btn{
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+.Add-role-main{
+    display: flex;
+    flex-direction: column;
+    margin: 20px;
+    gap: 10px;
+}
+.add-role-btn-area{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+.delete-role-main{
+    display: flex;
+    flex-direction: row;
+    
+}

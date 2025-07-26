@@ -1,0 +1,3 @@
+spring:
+  profiles:
+    active: dev  # Change to prod when deploying JAR
