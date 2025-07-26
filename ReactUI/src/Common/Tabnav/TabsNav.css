@@ -1,0 +1,61 @@
+.tabs-nav-backup {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #f5f5f5;
+  display: flex;
+  justify-content: flex-start;
+  padding-top: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  gap: 30px;
+}
+
+.tabs-nav{
+      position: sticky;
+    /* top: 0; */
+    /* left: 0; */
+    /* right: 0; */
+    background: #f5f5f5;
+    display: flex
+;
+    /* justify-content: flex-start; */
+    padding-top: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    /* gap: 30px;*/
+}
+
+.tab-link {
+  text-decoration: none;
+  padding: 10px 15px;
+  color: #555;
+  font-size: 1rem;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.tab-link:hover {
+  color: #2980b9;
+}
+
+.tab-link.active {
+  color: #2223e6;
+  font-weight: bold;
+  border-bottom: 3px solid #2223e6;
+}
+/*  */
+
+.sticky-menu{
+  position: sticky;
+  top: 0;
+}
+
+
+.appbar{
+  z-index: 1;
+}
+.appbar1{
+  min-height: 10px;
+}

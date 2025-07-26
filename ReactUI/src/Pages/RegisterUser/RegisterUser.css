@@ -1,0 +1,51 @@
+.registeration-page{
+    /* display: flex;
+    height: 100vh;
+    width: 100%;
+    justify-content: center;
+    align-items: center;  */
+
+    display: flex
+;
+    /* height: 100vh; */
+    width: 90%;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    margin: 40px;
+}
+
+.registeration-form {
+    background-color: white;
+    box-shadow: 0 4px 12px;
+    width: 60rem;
+    border-radius: 10px;
+        padding: 2rem;
+    /* padding: 25px;
+    display: flex;
+    margin: 25px;
+    justify-content: center;*/
+    align-items: center; 
+}
+
+.registeration-form  h3 {
+   padding: 0px;
+    margin: 0;
+    background-color: blue;
+    color: white;
+    /* height: 3rem; */
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    /* margin: 0rem 0rem 0rem 0rem; */
+    padding: 1rem;
+    border-radius: 10px 10px 0px 0px;
+    margin: -2rem -2rem 1.5rem -2rem;
+}
+
+.reg-btn-grp{
+    display: flex;
+    flex-direction: row;
+    gap: 19px;
+    justify-content: center;
+}
