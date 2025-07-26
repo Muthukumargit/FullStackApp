@@ -60,7 +60,7 @@ public class UserController {
 	            String token = jwt.generateToken(auth.getName(),roles);
 	            ResponseCookie cookie = ResponseCookie.from("JWT-Token", token)
 	                    .httpOnly(true)
-	                    .secure(false)
+	                    .secure(true)
 	                    .path("/")
 	                    .sameSite("Lax")
 	                    .maxAge(Duration.ofMinutes(30))
@@ -95,7 +95,7 @@ public class UserController {
 	public Mono<Void> logout(ServerHttpResponse response){
 		  ResponseCookie cookie = ResponseCookie.from("JWT-Token", "")
 		            .httpOnly(true)
-		            .secure(false)
+		            .secure(true)
 		            .path("/")
 		            .maxAge(0)
 		            .build();
