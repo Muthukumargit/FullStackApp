@@ -37,7 +37,7 @@ This is a full-stack web application designed for **task creation, assignment, a
   - **User Service**: Handles tasks, roles, messages, notifications
 - **Deployment**: Render
 - **Authentication**: Session/JWT based (implemented)
-- **Email Verification**: 🔜 *Coming soon*
+- **Email Verification**: (Implemented)
 
 ---
 
