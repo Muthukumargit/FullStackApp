@@ -1,10 +1,15 @@
 package com.gatewayapi.Dao;
 
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
 
 import com.gatewayapi.Model.Users;
@@ -34,11 +39,12 @@ public class UserDao {
 		log.info("user name ::"+userName);
 		String sql = "SELECT\n"+
 				"    u.user_id,\n"+
-				"    U.password,\n"+
+				"    u.password,\n"+
 				"    LISTAGG(ar.role_name, ',') WITHIN GROUP(\n"+
 				"    ORDER BY\n"+
 				"        ar.role_cd\n"+
-				"    ) roleList \n"+
+				"    ) rolelist,\n"+
+				"    u.email_verification_in\n"+
 				"FROM\n"+
 				"    app_users u,\n"+
 				"    user_role ur,\n"+
@@ -46,31 +52,38 @@ public class UserDao {
 				"WHERE\n"+
 				"        u.user_id = ur.user_id\n"+
 				"    AND ur.role_cd = ar.role_cd\n"+
-				"    AND upper(u.user_id) = upper(?) \n"+
-				"    GROUP BY U.USER_ID,U.password";
+				"    AND upper(u.user_id) = upper(?)\n"+
+				"    AND u.active_in = 1\n"+
+				"GROUP BY\n"+
+				"    u.user_id,\n"+
+				"    u.password,\n"+
+				"    u.email_verification_in";
 		
 		
 		Users user = oracleTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(Users.class), args);
 		return user;
 	}
 	
-	public String register(userprofileDto userDetails) {
+	public String register(userprofileDto userDetails) throws Exception {
 		int user=0;
-		user = oracleTemplate.update(
-				"Insert into app_users (user_id,password,email,CREATED_DT,UPDATED_DT) values (?,?,?,current_timestamp,current_timestamp)",
-				new Object[] { userDetails.getUserId(), userDetails.getPassword(),userDetails.getEmail() });
-		int userProfile=0;
-		if(user>0)
-		{
-			userProfile = oracleTemplate.update(
-					"insert into user_profile (user_id,first_name,last_name,last_login_at,CREATE_ts,UPDATE_ts,email) values (?,?,?,null,current_timestamp,current_timestamp,?)",
-					new Object[] { userDetails.getUserId(), userDetails.getFirstName(),userDetails.getLastName(),userDetails.getEmail() });
-			oracleTemplate.update("insert into user_role (user_id,role_cd,CREATED_DT,UPDATED_DT) values (?,'U',current_timestamp,current_timestamp)",userDetails.getUserId());
-			oracleTemplate.update("insert into user_role (user_id,role_cd,CREATED_DT,UPDATED_DT) values (?,'A',current_timestamp,current_timestamp)",userDetails.getUserId());
-		}
 		String result="";
-		if(user>0 && userProfile >0 ) {
-			result="User Registered Successfully...!";
+		
+		SimpleJdbcCall procetureCall = new SimpleJdbcCall(oracleTemplate)
+				.withCatalogName("USER_MANAGER_PKG")
+				.withProcedureName("create_user");
+
+		SqlParameterSource inParams = new MapSqlParameterSource()
+				.addValue("p_user_id",userDetails.getUserId() )
+				.addValue("p_first_name",userDetails.getFirstName())
+				.addValue("p_last_name", userDetails.getLastName())
+				.addValue("p_email", userDetails.getEmail())
+				.addValue("p_password", userDetails.getPassword());
+		
+		Map<String, Object> output = procetureCall.execute(inParams);
+				if(output.get("P_RESULT").toString().equalsIgnoreCase("SUCCESS") ) {
+			result="User Registered Successfully...!";			
+		}else{
+			throw new Exception("Failed to add Users");
 		}
 		
 		log.info("After insert ::"+user);
@@ -88,5 +101,19 @@ public class UserDao {
 		
 		
 	}
+	
+	public Mono<String> verifyEmail(String Email){
+		log.info("Userid ::"+Email+"***************");
+		return Mono.fromCallable(() ->{
+			String sql="select case when EXISTS (select 1 from app_users where email= ? ) then 'Email Already Exisits' else 'Email is availble' end as message from dual";
+			return oracleTemplate.queryForObject(sql, String.class,Email);
+		}).subscribeOn(Schedulers.boundedElastic())
+				.doOnSuccess(restlt -> log.info("Result from db {}",restlt))
+				.onErrorResume(e -> Mono.just(e.getMessage()));
+		
+		
+	}
+	
+	
 	
 }

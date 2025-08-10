@@ -21,7 +21,7 @@ dayjs.extend(timezone);
 const Landing = () => {
 
   const userprofile = useAppSelector(state => state.profile);
-  console.log("User Profile", userprofile);
+  // console.log("User Profile", userprofile);
   const [showSnackbar, setShowSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
@@ -45,14 +45,14 @@ const Landing = () => {
    setShowloading(true); 
   },[])
 
-  const [taskForm, setTaskForm] = useState<TaskDetails>({
-    taskType: '',
-    taskDescription: '',
-    taskName: '',
-    assignedToUserId: '',
-    addAdminUsers: false,
-    dueDate: ''// Initialize with current date
-  });
+  // const [taskForm, setTaskForm] = useState<TaskDetails>({
+  //   taskType: '',
+  //   taskDescription: '',
+  //   taskName: '',
+  //   assignedToUserId: '',
+  //   addAdminUsers: false,
+  //   dueDate: ''// Initialize with current date
+  // });
   const [UpdateTaskDetails, setUpdateTaskDetails] = useState<UpdateTaskDetails>({
     ticketId: '',
     taskType: { taskCode: '', taskType: '' },
@@ -70,14 +70,14 @@ const Landing = () => {
     // setOpen(false); 
     // alert("Drawer closed");
     setOpen(false);
-    setTaskForm({
-      taskType: '',
-      taskDescription: '',
-      taskName: '',
-      assignedToUserId: '',
-      addAdminUsers: false,
-      dueDate: ''
-    });
+    // setTaskForm({
+    //   taskType: '',
+    //   taskDescription: '',
+    //   taskName: '',
+    //   assignedToUserId: '',
+    //   addAdminUsers: false,
+    //   dueDate: ''
+    // });
     setUpdateTaskDetails({
       ticketId: '',
       taskType: { taskCode: '', taskType: '' },
@@ -97,10 +97,10 @@ const Landing = () => {
 
   const handleCreateTask = async (updatedForm: TaskDetails) => {
     // e.preventDefault();
-    debugger;
-    console.log('Add form ', updatedForm);
-    setTaskForm(updatedForm);
-    console.log("Creating task with form data", taskForm);
+    // debugger;
+    // console.log('Add form ', updatedForm);
+    // setTaskForm(updatedForm);
+    // console.log("Creating task with form data", taskForm);
     if (!updatedForm.taskType || !updatedForm.taskName || !updatedForm.assignedToUserId) {
       alert("Please fill all required fields");
       return;
@@ -115,7 +115,7 @@ const Landing = () => {
         setSnackbarMessage(data);
         setSnackbarSeverity('success');
         setShowSnackbar(true);       
-        console.log("Task created successfully", data);
+        // console.log("Task created successfully", data);
         setOpen(false);
         setTaskForm({
           taskType: '',
@@ -138,11 +138,11 @@ const Landing = () => {
   const getAllDetails = async () => {
     // setShowloading(true)
     let customUrl = '/userservice/getUserTasks';
-    console.log(userprofile.profile)
+    // console.log(userprofile.profile)
     if (userprofile.profile?.roles.includes('ADMIN')) {
       customUrl = '/userservice/getAllTasks';
     }
-    console.log('custom URL ', customUrl);
+    // console.log('custom URL ', customUrl);
     const response = await sendHTTPRequest(window.location.origin + customUrl, {
       method: 'GET'
     });
@@ -152,7 +152,7 @@ const Landing = () => {
       if (response.status == 200) {
         const data = await response.json();
         setShowloading(false); 
-        console.log(data);
+        // console.log(data);
         const flatData = data.map((item: any) => ({
           ticketId: item.ticketId,
           taskName: item.taskName,
@@ -172,7 +172,7 @@ const Landing = () => {
           updatedDate: item.updatedDate,
         }));
         setTableData(flatData);
-        console.log('data for all the details', flatData);
+        // console.log('data for all the details', flatData);
         setShowloading(false); 
       }
 
@@ -277,7 +277,7 @@ const Landing = () => {
               setSnackbarSeverity("error");
             }
 
-            console.log(status);
+            // console.log(status);
             setEditDetails(!editDetails);
           }}
           updateForm={UpdateTaskDetails}

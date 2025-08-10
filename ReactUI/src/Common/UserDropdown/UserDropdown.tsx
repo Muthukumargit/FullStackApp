@@ -16,7 +16,7 @@ export default function UserDropdown({profile,onProfileRefresh}:UserDropdownProp
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const handleLogout = (): void => {
-    console.log('User logged out');
+    // console.log('User logged out');
       sendHTTPRequest(window.location.origin+'/logout',{method:'Get'}).then(res =>{
          if(res.ok){
            window.location.href='/UI/login';
@@ -31,7 +31,7 @@ export default function UserDropdown({profile,onProfileRefresh}:UserDropdownProp
       body: String(profile?.pushNotification===0?1:0)
     });
     if(response.ok){
-        console.log(response.status);
+        // console.log(response.status);
       if(response.status===200){
         alert('Push notifiaction changed');
         onProfileRefresh();
@@ -75,9 +75,9 @@ export default function UserDropdown({profile,onProfileRefresh}:UserDropdownProp
         <Portal >
         <div ref={menuRef} className="dropdown-panel">
           <div className="user-info">
-            <div className="">First name : {profile?.firstName}</div>
-            <div className="">Last Name : {profile?.lastName}</div>
-            <div className="">Roles : {profile?.roles}</div>
+            <div className='user-details'><div className='user-lable'>First name :</div> <div className='user-value'>{profile?.firstName}</div></div>
+            <div className='user-details'><div className='user-lable'>Last Name : </div><div className='user-value'>{profile?.lastName}</div></div>
+            <div className='user-details'><div className='user-lable'>Roles :     </div><div className='user-value'>{profile?.roles}</div></div>
             <div >Push Notification <Switch checked={profile?.pushNotification===1} onChange={enablePushNotification} /> </div>
           </div>
           <hr />

@@ -46,7 +46,7 @@ const EditModal = ({
     X: "Cancelled",
     N: "NEW",
   };
-  console.log("updatedForm ::", updateForm);
+  // console.log("updatedForm ::", updateForm);
   const [localForm, setLocalForm] = useState<UpdateTaskDetails>({
     ticketId: "",
     taskType: { taskCode: "", taskType: "" },
@@ -102,9 +102,9 @@ const EditModal = ({
       [field]: value,
     }));
 
-    console.log("field ", field, " value ", value);
+    // console.log("field ", field, " value ", value);
 
-    console.log("inside form change", localForm);
+    // console.log("inside form change", localForm);
   };
 
   useEffect(() => {
@@ -143,7 +143,7 @@ const EditModal = ({
     );
 
     if (response.ok) {
-      console.log(response.status);
+      // console.log(response.status);
       if (response.status === 200) {
         const data = await response.text();
         // alert('body '+data);
@@ -159,7 +159,7 @@ const EditModal = ({
   };
 
   function generateFeedbackHistory(feedback: any) {
-    console.log("inside json ::", feedback);
+    // console.log("inside json ::", feedback);
     if (!feedback) return [];
     try {
       const json = feedback;

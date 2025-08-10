@@ -54,21 +54,15 @@ const LoginPage: React.FC = () => {
   // });
 
   const handleSubmit = async (e: FormEvent) => {
+    // debugger;
     e.preventDefault();
     setError("");
     setShowloading(true);
-
     try {
-      // const response1 = await fetch(window.location.origin+'/login', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   //   'X-CSRF-TOKEN': csrfToken,
-      //   },
-      //   credentials: 'include',
-      //   body: JSON.stringify({ userId, password }),
-      // });
-
+      if(window.location.origin.includes("render")){
+        console.log('Waking up render server');
+        sendHTTPRequest("https://reactapp-userservice.onrender.com/",{method:"GET"});
+      }
       const response = await sendHTTPRequest(
         window.location.origin + "/login",
         {
@@ -78,12 +72,12 @@ const LoginPage: React.FC = () => {
       );
 
       if (response.ok) {
-        debugger;
+        // debugger;
 
         const data = await response.json();
 
-        console.log(data);
-        debugger;
+        // console.log(data);
+        // debugger;
         dispatcher(setUser(data));
         // window.location.href = '/UI/';
         updateLastLoggedin();

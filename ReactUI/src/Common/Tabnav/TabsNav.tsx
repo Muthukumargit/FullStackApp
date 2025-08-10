@@ -21,7 +21,7 @@ const TabsNav = () => {
    }, [dispatch]);
 
    useEffect(() => {
-      console.log("userprofile inside header load", userprofile);
+      // console.log("userprofile inside header load", userprofile);
       if (userprofile.fetched) {
          sendHTTPRequest(window.location.origin + "/userservice/headers", {
             method: "Get",
@@ -32,20 +32,20 @@ const TabsNav = () => {
                }
             })
             .then((data) => {
-               console.log("data", data);
+               // console.log("data", data);
                // @ts-ignore
                const headerHtml = pupulateTabs(data.split(","));
                // @ts-ignore
                updatePermittedpages(headerHtml);
-               console.log(permittedpages);
+               // console.log(permittedpages);
             });
-         console.log(userprofile);
+         // console.log(userprofile);
       }
    }, [userprofile.fetched]);
 
    useEffect(() => {
       if (user.isAuthenticated && !userprofile.fetched) {
-         console.log("fetching the user Details");
+         // console.log("fetching the user Details");
          dispatch(fetchUserDetails());
       }
    }, [user.isAuthenticated, userprofile.fetched, dispatch]);

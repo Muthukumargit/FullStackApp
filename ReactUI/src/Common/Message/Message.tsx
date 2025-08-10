@@ -1,7 +1,7 @@
 import './MessageImproved.css';
 import { useAppSelector } from '../Store/hooks';
 import { useEffect, useRef, useState } from 'react';
-import { Badge, Box, Card, CardContent, Dialog, DialogActions, DialogContent, DialogTitle, FilledInput, FormControl, IconButton, InputAdornment, Portal, Typography } from '@mui/material';
+import { Badge, Box, Card, CardContent, Dialog, DialogActions, DialogContent, DialogTitle, FilledInput, FormControl, IconButton, InputAdornment, Portal, TextField, Typography } from '@mui/material';
 import sendHTTPRequest from '../Utils/HttpWrappers';
 import notificationosund from '../../assets/audio/bell-notification-337658.mp3'
 import dayjs from 'dayjs';
@@ -52,8 +52,8 @@ useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chathistory]);
   useEffect(() => {
-    console.log(activeUsers.includes(messgetouser));
-    console.log(activeUsers);
+    // console.log(activeUsers.includes(messgetouser));
+    // console.log(activeUsers);
   if (chatWindow) {
     // Wait for the dialog to render
     setTimeout(() => {
@@ -66,13 +66,13 @@ useEffect(() => {
         const protocol=window.location.protocol === 'https:' ? 'wss':'ws';
         ws.current=new WebSocket(`${protocol}://${window.location.host}/userservice/ws/messages?userId=${userProfile.profile?.userId}`);
         ws.current.onmessage= (event) =>{
-            debugger;
+            // debugger;
             const data=JSON.parse(event.data);
             if(data.type=='onlineList'){
-                console.log(data.users);
+                // console.log(data.users);
                 setUserList(data.users);
             }else if(data.type=='chat'){
-                console.log('chat details',data);
+                // console.log('chat details',data);
                
                  setUnreadCounts(prev => ({
             ...prev,
@@ -104,7 +104,7 @@ const ringNotification = () => {
 };
     const sendmessage = () =>{
 
-        console.log('sending message to ',messgetouser,' content ',message);
+        // console.log('sending message to ',messgetouser,' content ',message);
         ws.current?.send(JSON.stringify({
             type:'chat',
             from:userProfile.profile?.userId,
@@ -126,21 +126,21 @@ const ringNotification = () => {
         
     }
     const resetBadge = (userId:string) =>{
-        debugger;
+        // debugger;
         const readcount=unreadCounts[userId];
         unreadCounts[userId]=0;
         if(unreadmessage >0){
         setUnReadMessage(prev => (prev-readcount));
         }
         
-        console.log(unreadmessage);
-        console.log(unreadCounts);
+        // console.log(unreadmessage);
+        // console.log(unreadCounts);
     }
     const openchatwindow = async (touser: string) => {
-        console.log('open window for ', touser);
+        // console.log('open window for ', touser);
         setMessageToUser(touser);
-        debugger;
-        console.log('active users',activeUsers);
+        // debugger;
+        // console.log('active users',activeUsers);
         const userId = userProfile.profile?.userId ?? '';
         const response = await sendHTTPRequest(window.location.origin + `/userservice/chat?user1=${encodeURIComponent(userId)}&user2=${encodeURIComponent(touser)}`, {
             method: 'GET'
@@ -148,7 +148,7 @@ const ringNotification = () => {
         
         if(response.ok){
     const data = await response.json();
-    console.log('chat history :: ', data);
+    // console.log('chat history :: ', data);
     setChatHistory(data); // Set all at once
     setTimeout(() => setChatWindow(true), 0); // Open after DOM update
 }
@@ -331,7 +331,49 @@ const inactiveUsers = userList.filter(user => user.ONLINE_STATUS !== 1);
 </DialogContent>
 <DialogActions className="dialog-actions">
   <div>
-     <FormControl sx={{ mb: 0,m:1, }} variant="filled">
+     <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'flex-end',
+        gap: 1,
+        width: '100%',
+      }}
+    >
+      <TextField
+      sx={{lg:2}}
+        multiline
+        fullWidth
+        maxRows={4}
+        variant="outlined"
+        placeholder="Type your message..."
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+      />
+      <IconButton 
+        color="primary" 
+        onClick={sendmessage} 
+        sx={{ alignSelf: 'flex-end' }}
+      >
+        <SendIcon />
+      </IconButton>
+    </Box>
+     {/* <FormControl sx={{ mb: 0,m:1, }} variant="filled">
+
+        <TextField
+          id="filled-multiline-flexible"
+          label="Multiline"
+          multiline
+          maxRows={3}
+          variant="filled"
+           endAdornment={
+              <InputAdornment position="end">
+                <IconButton  onClick={sendmessage}
+                >
+                  <SendIcon />
+                </IconButton>
+              </InputAdornment>
+            }
+        />
           <FilledInput 
             id="filled-adornment-password"
             type='text'
@@ -346,7 +388,7 @@ const inactiveUsers = userList.filter(user => user.ONLINE_STATUS !== 1);
               </InputAdornment>
             }
           />
-        </FormControl>
+        </FormControl> */}
   </div>
 </DialogActions>
                        </Dialog>

@@ -1,15 +1,11 @@
 package com.gatewayapi.jwtUtils;
 
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,12 +50,10 @@ public class JwtService {
 				   
 		
 	}
-
 	public SecretKey getKey() {
 		byte[] keybytes= Decoders.BASE64.decode(env.getProperty("JWT.KEY"));
 		return Keys.hmacShaKeyFor(keybytes);
 	}
-
 	public String extractUserName(String token) {		
 		return extractClaim(token,Claims::getSubject);
 	}

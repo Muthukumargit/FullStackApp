@@ -1,13 +1,17 @@
 package com.userservice.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter;
 import com.userservice.model.RoleDetails;
+import com.userservice.model.RoleUserMapDTO;
 import com.userservice.service.MaintenanceService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -16,9 +20,15 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @RestController
 public class MaintenanceController {
+
+    private final WebSocketHandlerAdapter handlerAdapter;
 	
 	@Autowired
 	private MaintenanceService service;
+
+    MaintenanceController(WebSocketHandlerAdapter handlerAdapter) {
+        this.handlerAdapter = handlerAdapter;
+    }
 	
 	@PostMapping("/checkRoleCd")
 	public Mono<ResponseEntity<String>> checkRoleCd(@RequestBody String roleCd){
@@ -47,6 +57,26 @@ public class MaintenanceController {
 								return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
 							}
 						}).doOnError(e -> log.error("Error while adding Role {}",e));
+	}
+	
+	@GetMapping("/roleUserMap")
+	public Mono<ResponseEntity<List<RoleUserMapDTO>>> getAllgetAllRolesWithUserIds(){
+		log.info("Entered into getAllgetAllRolesWithUserIds method");
+		
+		return service.getAllRolesWithUserIds().map(result ->{
+			if(result.size() >0) {
+				return ResponseEntity.status(HttpStatus.OK).body(result);
+			}else {
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(result);
+			}
+		}).doOnSuccess(result -> log.info("Successfully fetched values {}"))
+	   	  .doOnError(e -> log.error("Error while adding Role {}",e));
+	}
+	
+	@PostMapping("/deleteRole")
+	public Mono<String> deleteRole(@RequestBody String RoleList){
+		log.info("Delete List ::"+RoleList);
+		return service.deleteSelectedRoles(RoleList);
 	}
 
 }

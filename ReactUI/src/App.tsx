@@ -18,13 +18,13 @@ const App =({activeRoute}:AppProps) => {
  if(user.isAuthenticated){
  if(!userprofile.fetched)
  {
-  debugger;
-  console.log('fetching the user Details');
+  // debugger;
+  // console.log('fetching the user Details');
  fetchUserDetails();
  }
 }
 useEffect(() =>{
-  debugger;
+  // debugger;
   if(user.isAuthenticated){
     setShowloading(true);
     if(userprofile.fetched){

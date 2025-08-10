@@ -7,6 +7,12 @@ export const fetchUserDetails = createAsyncThunk(
   'userProfile/fetchUserDetails',
   async (_, { dispatch }) => {
     const response = await sendHTTPRequest(window.location.origin + '/userservice/getProfile', { method: 'GET' });
+    // console.log(window.location.origin);
+    // console.log('Response from getProfile',response.status);
+    if(window.location.origin.includes("render ") && response.status == 429){
+      console.log('Waking up render');
+      sendHTTPRequest("https://reactapp-userservice.onrender.com/",{method:"GET"});
+    }
     if (response.ok) {
       const data = await response.json();
       dispatch(setProfile(data));

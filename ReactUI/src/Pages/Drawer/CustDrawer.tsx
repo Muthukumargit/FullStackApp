@@ -57,8 +57,8 @@ const CustDrawer = ({ show, createTask, onclose }: DrawerProperties) => {
    };
 
    const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { name, value } = e.target;
-      console.log(name, " ", value);
+      // const { name, value } = e.target;
+      // console.log(name, " ", value);
       setLocalForm({
          ...localForm,
          [e.target.name]: e.target.value,
@@ -199,7 +199,7 @@ const CustDrawer = ({ show, createTask, onclose }: DrawerProperties) => {
                                     ...localForm,
                                     dueDate: localDate ? localDate.toString() : "",
                                  });
-                                 console.log("localdate ::", localDate);
+                                 // console.log("localdate ::", localDate);
                               }}
                               name="dueDate"
                               disablePast

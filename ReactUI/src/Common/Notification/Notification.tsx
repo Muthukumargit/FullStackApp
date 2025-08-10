@@ -54,7 +54,7 @@ const Notification = ({ userprofile }: notificationProp) => {
         }
       })
       .then((data) => {
-        console.log("Notification ::", data);
+        // console.log("Notification ::", data);
         setNotificationList(data);
       });
   }, [userprofile.pushNotification]);
@@ -64,10 +64,10 @@ const Notification = ({ userprofile }: notificationProp) => {
     const ws = new WebSocket(
       `${protocol}://${window.location.host}/userservice/ws/notifications?userId=${userprofile.userId}`
     );
-    debugger;
+    // debugger;
     ws.onmessage = (event) => {
       const notif = JSON.parse(event.data);
-      console.log("Notification Received:", notif);
+      // console.log("Notification Received:", notif);
       setNotificationList((prev) => [notif, ...prev]);
       setbadgeCount((prev) => prev + 1);
       if (userprofile.pushNotification === 1) ringNotification();
@@ -116,7 +116,7 @@ const Notification = ({ userprofile }: notificationProp) => {
   const ringNotification = () => {
     // console.log("inside sound", prevBadgeCountRef.current, "new count:", newCount);
     // if (newCount > prevBadgeCountRef.current) {
-    console.log("playing sound");
+    // console.log("playing sound");
     const audio = new Audio(notificationosund);
     audio.play().catch((err) => console.warn("Audio play failed:", err));
     // }
