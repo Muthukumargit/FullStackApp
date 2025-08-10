@@ -22,12 +22,19 @@ const Registeruser = () => {
    const [verifinguserId, setVerifingUserId] = useState(false);
    const [isUserVerified, setIsUserVerified] = useState(false);
    const [isUserIdValid, setIsUserIdValid] = useState(false);
+    const [verifingEmail, setVerifingEmail] = useState(false);
+   const [isEmailVerified, setIsEmailVerified] = useState(false);
+   const [isEmailValid, setIsEmailValid] = useState(false);
    const [showSnackbar, setShowSnackbar] = useState(false);
    const [snackbarMessage, setSnackbarMessage] = useState("");
    const [snanackbartype, setSnackbarType] = useState<"success" | "error">("success");
 
    const [showPassword, setShowPassword] = useState(false);
    const [showPasswordconfirm, setShowPasswordConfirm] = useState(false);
+
+   const [emailError, setEmailError] = useState(false);
+   const [emailHelperText, setEmailHelperText] = useState("");
+
    const handleClickShowPassword = () => setShowPassword(!showPassword);
    const handleClickShowPasswordConfirm = () => setShowPasswordConfirm(!showPasswordconfirm);
    const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -53,9 +60,44 @@ const Registeruser = () => {
       });
    };
 
+   const handleVerifyEmail = (email : string) =>{
+      setVerifingEmail(true);
+      sendHTTPRequest(`${window.location.origin}/verifyEmail`,{
+         method:"POST",
+         body: email,
+      }).then((response) => {
+         if(response.ok){
+            setVerifingEmail(false);
+            if(response.status === 200){
+               response.text().then((data) =>{
+                  setVerifingEmail(true);
+                  if(data === "Email is availble"){
+                     setSnackbarType("success")
+                  setShowSnackbar(true);
+                           setSnackbarMessage("Email is available to take");
+                           setVerifingEmail(false);
+                           setIsEmailValid(true);
+                           setIsEmailVerified(true);
+                        } else {
+                           // debugger;
+                           setShowSnackbar(true);
+                           setSnackbarType("error");
+                           setSnackbarMessage("Email is not available to take");
+                           setVerifingEmail(false);
+                           setIsEmailVerified(true);
+                           setIsEmailValid(false);
+                        }
+               });
+            }else{
+               setVerifingEmail(false);
+            }
+         }
+      })
+   }
+
    const handleverifyUserId = (e: React.ChangeEvent<HTMLInputElement>) => {
       const userId = e.target.value;
-      debugger;
+      // debugger;
       if (userId) {
          setVerifingUserId(true);
          sendHTTPRequest(`${window.location.origin}/verifyUserId`, {
@@ -67,20 +109,20 @@ const Registeruser = () => {
                   setVerifingUserId(false);
                   // setIsUserIdValid(userId.length >= 5);
                   if (response.status === 200) {
-                     debugger;
+                     // debugger;
                      response.text().then((data) => {
-                        debugger;
+                        // debugger;
                         setVerifingUserId(true);
-                        console.log("User ID verification response:", data);
+                        // console.log("User ID verification response:", data);
                         if (data === "User ID is availble") {
                            setSnackbarType("success");
                            setShowSnackbar(true);
-                           setSnackbarMessage("User ID is available");
+                           setSnackbarMessage("User ID is available to take");
                            setVerifingUserId(false);
                            setIsUserIdValid(true);
                            setIsUserVerified(true);
                         } else {
-                           debugger;
+                           // debugger;
                            setShowSnackbar(true);
                            setSnackbarType("error");
                            setSnackbarMessage("User ID is not available to take");
@@ -152,6 +194,31 @@ const Registeruser = () => {
          });
    };
 
+   const validateEmail = (email: string) => {
+      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+      if (!regex.test(email)) {
+         setEmailError(true);
+         setEmailHelperText("Enter a valid email address");
+      } else {
+         setEmailError(false);
+         setEmailHelperText("");
+         handleVerifyEmail(email);
+      }
+   };
+
+   const isFormValid = () => {
+      return (
+         registerForm.userId.trim() !== "" &&
+         registerForm.firstName.trim() !== "" &&
+         registerForm.lastName.trim() !== "" &&
+         registerForm.email.trim() !== "" &&
+         registerForm.password.trim() !== "" &&
+         confirmPassword.trim() !== "" &&
+         registerForm.password === confirmPassword &&
+         !emailError &&
+         isUserIdValid && isEmailValid
+      );
+   };
    return (
       <>
          <span>
@@ -195,9 +262,30 @@ const Registeruser = () => {
                               }}
                            />
                         </FormControl>
-                        <FormControl sx={{ m: 1, width: "50ch" }} fullWidth variant="outlined">
+                        <FormControl sx={{ m: 1, width: "50ch" }} fullWidth variant="outlined" error={emailError}>
                            <InputLabel htmlFor="outlined-adornment-email">Email</InputLabel>
-                           <OutlinedInput value={registerForm?.email} name="email" onChange={handleFormChange} id="outlined-adornment-email" label="email" />
+                           <OutlinedInput
+                              value={registerForm?.email}
+                              name="email"
+                              onChange={handleFormChange}
+                              onBlur={(e) => validateEmail(e.target.value)}
+                              id="outlined-adornment-email"
+                               endAdornment={
+                                 <>
+                                    {verifingEmail ? (
+                                       <CircularProgress size={20} color="info" />
+                                    ) : isEmailVerified ? (
+                                       isEmailValid && registerForm.email.length > 0 ? (
+                                          <Verified color="success" />
+                                       ) : registerForm.email.length > 0 ? (
+                                          <NewReleasesIcon color="error" />
+                                       ) : null
+                                    ) : null}
+                                 </>
+                              }
+                              label="email"
+                           />
+                           {emailError && <p style={{ color: "red", margin: "3px 14px 0" }}>{emailHelperText}</p>}
                         </FormControl>
                      </div>
                      <div>
@@ -268,19 +356,9 @@ const Registeruser = () => {
                               <Button
                                  variant="contained"
                                  color="primary"
-                                 // sx={{ m: 1, width: '57ch' }}
+                                 disabled={!isFormValid()}
                                  onClick={() => {
-                                    // if (registerForm.userId === '' || registerForm.email === '' || registerForm.firstName === '' || registerForm.LastName === '' || registerForm.password === '') {
-                                    //   setSnackbarType('error');
-                                    //   setSnackbarMessage('Please fill all the fields');
-                                    //   setShowSnackbar(true);
-                                    //   return;
-                                    // }else{
                                     hanldeSubmit();
-
-                                    // }
-                                    // Handle registration logic here
-                                    console.log("Registering user:", registerForm);
                                  }}
                               >
                                  Register
@@ -289,10 +367,12 @@ const Registeruser = () => {
                                  variant="outlined"
                                  color="secondary"
                                  type="reset"
-                                 // sx={{ m: 1, width: '57ch' }}
                                  onClick={() => {
-                                    // Handle cancel logic here
-                                    console.log("Registration cancelled");
+                                    setRegisterForm({ userId: "", firstName: "", lastName: "", email: "", password: "" });
+                                    setConfirmPassword("");
+                                    setEmailError(false);
+                                    setEmailHelperText("");
+                                    
                                  }}
                               >
                                  Reset

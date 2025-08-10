@@ -24,7 +24,7 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setUser(state, action: PayloadAction<User>) {
-      debugger;
+      // debugger;
       state.user = action.payload;
       state.isAuthenticated = true;
       state.fetched=true;

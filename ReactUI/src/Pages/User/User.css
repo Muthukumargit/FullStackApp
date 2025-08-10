@@ -181,7 +181,37 @@ gap: 20px;
     gap: 10px;
 }
 .delete-role-main{
+    /* display: flex;
+    flex-direction: row; */
+    margin: 15px;
+}
+.del-btn-area{
     display: flex;
     flex-direction: row;
-    
+    gap: 15px;
+}
+
+.user-details{
+display: flex
+;
+    justify-content: flex-start;
+}
+
+.user-lable{
+
+}
+
+.user-value{
+    text-wrap: auto;
+}
+
+.user-role-map{
+        width: 315px;
+    overflow-wrap: anywhere;
+}
+.delete-role-loading{
+    max-height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

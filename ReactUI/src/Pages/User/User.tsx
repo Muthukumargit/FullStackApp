@@ -17,6 +17,7 @@ import {
    OutlinedInput,
    Select,
    Snackbar,
+   Tooltip,
    Typography,
 } from "@mui/material";
 import { GridExpandMoreIcon } from "@mui/x-data-grid";
@@ -32,6 +33,7 @@ import type { userProfile } from "../../Common/Store/userProfileSlice";
 import Verified from "@mui/icons-material/Verified";
 import NewReleasesIcon from "@mui/icons-material/NewReleases";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import Loading from "../../Common/Loading/Loading";
 
 const User = () => {
    const [taskList, setTaskList] = useState<any[]>([]);
@@ -51,6 +53,8 @@ const User = () => {
    const [isRoleCdVerified, setIsRoleCdVerified] = useState(false);
    const [isRoleCdValid, setIsRoleCdValid] = useState(false);
    const [userList, setUserList] = useState<userProfile[]>([{ userId: "", firstName: "", lastName: "", lastLoggedIn: "", phone: 0, pushNotification: 0, roles: "" }]);
+   const [roleUserMap, setRoleUserMap] = useState([{ roleCd: "", roleName: "", userIds: [] }]);
+   const [deleteList,setDeleteList] = useState<any[]>([]);
    //  const[selecteduser,setSelectedUser]= useState<userProfile>({userId:'',
    //  firstName:'',
    //  lastName:'',
@@ -103,7 +107,7 @@ const User = () => {
             return res.json();
          })
          .then((res) => {
-            console.log("all users ", res);
+            // console.log("all users ", res);
             setUserList(res);
          });
    };
@@ -118,10 +122,10 @@ const User = () => {
    }, [selectedRole, roleList, taskList]);
 
    const handleRoleTask = () => {
-      console.log("Current role ", selectedRole);
-      console.log("selected values :: ", TaggedTask);
+      // console.log("Current role ", selectedRole);
+      // console.log("selected values :: ", TaggedTask);
       const selectedTask = TaggedTask.map((item) => item.type).join(",");
-      console.log("selected value ::", selectedTask);
+      // console.log("selected value ::", selectedTask);
       sendHTTPRequest(window.location.origin + "/userservice/updateRoleTaskTag", {
          method: "POST",
          headers: { "Content-Type": "application/json" },
@@ -180,42 +184,41 @@ const User = () => {
    };
    // @ts-ignore
    const handleverifyRoleCd = (e) => {
-      setVerifingRoleCd(true);
       const roleCd = e.target.value;
       if (roleCd) {
          setVerifingRoleCd(true);
          sendHTTPRequest(window.location.origin + "/userservice/checkRoleCd", {
             method: "POST",
             body: roleCd.toUpperCase(),
-         })
-            .then((res) => {
+         }).then((res) => {
+            setVerifingRoleCd(false);
+            // console.log(res);
+            if (res.status === 200) {
+               setSnackbarSeverity("success");
+               setShowSnackbar(true);
+               setSnackbarMessage("Role Code is available to Create");
                setVerifingRoleCd(false);
-               console.log(res);
-               if (res.status === 200) {
-                  setSnackbarSeverity("success");
-                  setShowSnackbar(true);
-                  setSnackbarMessage("Role Code is available to Create");
-                  setVerifingRoleCd(false);
-                  setIsRoleCdValid(true);
-                  setIsRoleCdVerified(true);
-               } else if (res.status === 400) {
-                  setShowSnackbar(true);
-                  setSnackbarSeverity("error");
-                  setSnackbarMessage("Role Code is not available to Create");
-                  setVerifingRoleCd(false);
-                  setIsRoleCdValid(false);
-                  setIsRoleCdVerified(true);
-               }
-               res.text();
-            })
-            .then((res) => {
-               console.log(res);
-            });
+               setIsRoleCdValid(true);
+               setIsRoleCdVerified(true);
+            } else if (res.status === 400) {
+               setShowSnackbar(true);
+               setSnackbarSeverity("error");
+               setSnackbarMessage("Role Code is not available to Create");
+               setVerifingRoleCd(false);
+               setIsRoleCdValid(false);
+               setIsRoleCdVerified(true);
+            }
+            res.text();
+         });
+      } else {
+         setVerifingRoleCd(false);
+         setIsRoleCdValid(false);
+         setIsRoleCdVerified(false);
       }
    };
    // @ts-ignore
    const handleFormChange = (e) => {
-      console.log("Entered into formchange");
+      // console.log("Entered into formchange");
       let { name, value } = e.target;
       value = value.toUpperCase();
       setNewRole({
@@ -241,12 +244,47 @@ const User = () => {
             setShowSnackbar(true);
             setSnackbarSeverity("error");
             setSnackbarMessage("Failed to Add Role");
-            // setVerifingRoleCd(false);
-            // setIsRoleCdValid(false);
-            // setIsRoleCdVerified(true);
          }
       });
    };
+   const handleDeleteOption = async () => {
+      setOpen(true);
+      setModalType("Delete");
+      const response = await sendHTTPRequest(window.location.origin + "/userservice/roleUserMap", { method: "GET" });
+
+      if (response.ok) {
+         const body = await response.json();
+         console.log("Body ::", body);
+         setRoleUserMap(body);
+         console.log(roleUserMap);
+      } else {
+      }
+   };
+   // @ts-ignore
+   const handleDeleteRoleSelect = (event) =>{
+      const value=event.target.value
+      const checked=event.target.checked;
+     debugger;
+         setDeleteList((prev) => {
+            if(prev.includes(value) && checked)
+               return prev.filter(role => role!==value);
+            else
+               return [...prev,value];
+         });
+         debugger;
+   }
+   const deleteRole = async () =>{
+      const deleteData=deleteList.join(',')
+      const response = await sendHTTPRequest(window.location.origin+'/userservice/deleteRole',
+         {
+            method:'POST',
+            body:JSON.stringify(deleteData)
+         }
+      );
+      if(response.ok){
+         console.log('delete response ',response);
+      }
+   }
    return (
       <>
          <Snackbar
@@ -285,17 +323,27 @@ const User = () => {
                                  value={selecteduser?.userId !== "" ? selecteduser?.userId : "Select User Id"}
                                  label="TaskType"
                                  onChange={(e) => {
-                                    debugger;
+                                    // debugger;
                                     setSelectedUser(userList.find((item) => item.userId == e.target.value));
                                  }}
                               >
-                                 <MenuItem>Select User Id</MenuItem>
+                                 <MenuItem>Create/Delete Role(s)</MenuItem>
                                  {userList.map((item, index) => (
                                     <MenuItem key={index} value={item.userId}>
                                        {item.firstName}
                                     </MenuItem>
                                  ))}
                               </Select>
+                              {!selecteduser && (
+                                 <FormHelperText>
+                                    Select <strong>User Id</strong> to assign/unassign role to user
+                                 </FormHelperText>
+                              )}
+                              {selecteduser && (
+                                 <FormHelperText>
+                                    Select <strong>Create/Delete Role(s)</strong> option to Mange the New/Exisiting Role
+                                 </FormHelperText>
+                              )}
                            </FormControl>
                            <div className="chip-area">
                               {selecteduser && <h3>Existing user Role :</h3>}
@@ -304,83 +352,71 @@ const User = () => {
                                  .map((item) =>
                                     item.roles.split(",").map((role, idx) => <Chip key={idx} color="success" variant="filled" label={role} style={{ marginRight: 4 }} />)
                                  )}
-
-                              {/* {selecteduser?.roles &&
-                                 selecteduser.roles.split(",").length > 0 &&
-                                 selecteduser.roles
-                                    .split(",")
-                                    .map((role: string, idx: number) => <Chip key={idx} color="success" variant="filled" label={role} style={{ marginRight: 4 }} />)} */}
                            </div>
                         </div>
                         <div className="user-role-area">
                            {allRoleList.map((item, idx) => (
-                              <>
+                              <div key={idx}>
                                  <FormControlLabel
                                     label={item.roleName}
                                     name={item.roleName}
                                     control={
-                                       <Checkbox key={idx}
+                                       <Checkbox
+                                          key={idx}
                                           disabled={selecteduser?.roles ? false : true}
                                           checked={selecteduser?.roles ? selecteduser.roles.includes(item.roleName) : false}
                                           onChange={() => {
                                              setSelectedUser(
                                                 selecteduser && item.roleName
                                                    ? selecteduser.roles.includes(item.roleName)
-                                                      ? // Remove role if exists
-                                                        {
+                                                      ? {
                                                            ...selecteduser,
                                                            roles: selecteduser.roles
                                                               .split(",")
                                                               .filter((role) => role !== item.roleName)
                                                               .join(","),
                                                         }
-                                                      : // Add role if not exists
-                                                        {
+                                                      : {
                                                            ...selecteduser,
                                                            roles: selecteduser.roles ? `${selecteduser.roles},${item.roleName}` : item.roleName,
                                                         }
                                                    : selecteduser
                                              );
-                                             console.log("selected user ::", selecteduser);
                                           }}
                                        />
                                     }
                                  />
-                              </>
+                              </div>
                            ))}
-                           <div className="add-role-btn">
-                              <Button
-                                 color="primary"
-                                 onClick={() => {
-                                    setOpen(true);
-                                    setModalType("Add");
-                                 }}
-                                 variant="contained"
-                                 startIcon={<AddIcon />}
-                              >
-                                 Add
+                           {!selecteduser && (
+                              <div className="add-role-btn">
+                                 <Button
+                                    color="primary"
+                                    onClick={() => {
+                                       setOpen(true);
+                                       setModalType("Add");
+                                    }}
+                                    variant="contained"
+                                    startIcon={<AddIcon />}
+                                 >
+                                    Add
+                                 </Button>
+                                 <Button color="error" onClick={handleDeleteOption} variant="contained" startIcon={<DeleteOutlineIcon />}>
+                                    Delete
+                                 </Button>
+                              </div>
+                           )}
+                        </div>
+                        {selecteduser?.userId && (
+                           <div className="manage-role-button">
+                              <Button variant="contained" color="primary" onClick={handleUpdateRole}>
+                                 Update
                               </Button>
-                              <Button
-                                 color="error"
-                                 onClick={() => {
-                                    setOpen(true);
-                                    setModalType("Delete");
-                                 }}
-                                 variant="contained"
-                                 startIcon={<DeleteOutlineIcon />}
-                              >
-                                 Delete
+                              <Button variant="outlined" color="secondary">
+                                 Cancel
                               </Button>
                            </div>
-                        </div>
-                        <div className="manage-role-button">
-                           <Button variant="contained" color="primary" onClick={handleUpdateRole}>
-                              Update
-                           </Button>
-                           <Button variant="outlined" color="secondary">
-                              Cancel
-                           </Button>
-                        </div>
+                        )}
                      </div>
                   </AccordionDetails>
                </Accordion>
@@ -390,8 +426,6 @@ const User = () => {
                   </AccordionSummary>
                   <AccordionDetails>
                      <FormControl fullWidth>
-                        
-                        <FormHelperText>Select Role to manage Assigned Task</FormHelperText>
                         <InputLabel id="demo-simple-select-label">Role</InputLabel>
                         <Select
                            labelId="demo-simple-select-label"
@@ -409,110 +443,118 @@ const User = () => {
                               </MenuItem>
                            ))}
                         </Select>
-                        <div className="taskselect-main">
-                           <div className="taskselect-area">
-                              <div className="item-area">
-                                 <div>Available Task</div>
-                                 <div className="available-task">
-                                    
-                                    {availableTaskForRole.map((item, idx) => (
-                                       <MenuItem
-                                          key={idx}
-                                          className={`available-item ${selectedfromAvailable.includes(item.type) ? "selected-item" : ""}`}
-                                          onDoubleClick={() => {
-                                             if (selectedRole) {
-                                                setTaggedTask((prev) => [...prev, item]);
-                                                setAvaiableTaskForRole((prev) => prev.filter((t) => t.type !== item.type));
-                                             }
-                                          }}
-                                          onClick={() => {
-                                             if (selectedRole) {
-                                                setSelectedFromAvailable((prev) => (prev.includes(item.type) ? prev.filter((type) => type !== item.type) : [...prev, item.type]));
-                                                console.log("selectedfromAvailable ", selectedfromAvailable);
-                                             }
-                                          }}
-                                       >
-                                          {item.typeDesc || item.type}
-                                       </MenuItem>
-                                    ))}
-                                 </div>
-                              </div>
+                        {!selectedRole && <FormHelperText>Select Role to manage Assigned Task</FormHelperText>}
+                        {selectedRole && (
+                           <>
+                              <div className="taskselect-main">
+                                 <div className="taskselect-area">
+                                    <div className="item-area">
+                                       <div>Available Task</div>
+                                       <div className="available-task">
+                                          {availableTaskForRole.map((item, idx) => (
+                                             <MenuItem
+                                                key={idx}
+                                                className={`available-item ${selectedfromAvailable.includes(item.type) ? "selected-item" : ""}`}
+                                                onDoubleClick={() => {
+                                                   if (selectedRole) {
+                                                      setTaggedTask((prev) => [...prev, item]);
+                                                      setAvaiableTaskForRole((prev) => prev.filter((t) => t.type !== item.type));
+                                                   }
+                                                }}
+                                                onClick={() => {
+                                                   if (selectedRole) {
+                                                      setSelectedFromAvailable((prev) =>
+                                                         prev.includes(item.type) ? prev.filter((type) => type !== item.type) : [...prev, item.type]
+                                                      );
+                                                      // console.log("selectedfromAvailable ", selectedfromAvailable);
+                                                   }
+                                                }}
+                                             >
+                                                {item.typeDesc || item.type}
+                                             </MenuItem>
+                                          ))}
+                                       </div>
+                                    </div>
 
-                              <div className="select-button-area">
-                                 <KeyboardArrowRightIcon
-                                    style={selectedRole ? { cursor: "pointer" } : { cursor: "no-drop",opacity: "0.5" }}
-                                    onClick={() => {
-                                       if (selectedRole) {
-                                          const selectedTasks = availableTaskForRole.filter((item) => selectedfromAvailable.includes(item.type));
-                                          setTaggedTask((prev) => [...prev, ...selectedTasks]);
-                                          setAvaiableTaskForRole((prev) => prev.filter((item) => !selectedfromAvailable.includes(item.type)));
-                                          setSelectedFromAvailable([]);
-                                       }
-                                    }}
-                                 />
-                                 <KeyboardDoubleArrowRightIcon
-                                    style={selectedRole ? { cursor: "pointer" } : { cursor: "no-drop",opacity: "0.5" }}
-                                    onClick={() => {
-                                       if (selectedRole) {
-                                          setTaggedTask(taskList);
-                                          setAvaiableTaskForRole([]);
-                                       }
-                                    }}
-                                 />
-                                 <KeyboardDoubleArrowLeftIcon
-                                    style={selectedRole ? { cursor: "pointer" } : { cursor: "no-drop",opacity: "0.5" }}
-                                    onClick={() => {
-                                       if (selectedRole) {
-                                          setAvaiableTaskForRole(taskList);
-                                          setTaggedTask([]);
-                                       }
-                                    }}
-                                 />
-                                 <KeyboardArrowLeftIcon
-                                    style={selectedRole ? { cursor: "pointer" } : { cursor: "no-drop",opacity: "0.5" }}
-                                    onClick={() => {
-                                       if (selectedRole) {
-                                          // Move selected from tagged to available
-                                          const selectedTasks = TaggedTask.filter((item) => selectedfromtagged.includes(item.type));
-                                          setAvaiableTaskForRole((prev) => [...prev, ...selectedTasks]);
-                                          setTaggedTask((prev) => prev.filter((item) => !selectedfromtagged.includes(item.type)));
-                                          setSelectedFromTagged([]);
-                                       }
-                                    }}
-                                 />
-                              </div>
-                              <div className="item-area">
-                                 <div>Selected Task</div>
-                                 <div className="selected-task">
-                                    {TaggedTask.map((item, idx) => (
-                                       <MenuItem
-                                          key={idx}
-                                          className={`available-item ${selectedfromtagged.includes(item.type) ? "selected-item" : ""}`}
-                                          onDoubleClick={() => {
-                                             if (selectedRole) {
-                                                setAvaiableTaskForRole((prev) => [...prev, item]);
-                                                setTaggedTask((prev) => prev.filter((t) => t.type !== item.type));
-                                             }
-                                          }}
+                                    <div className="select-button-area">
+                                       <KeyboardArrowRightIcon
+                                          style={selectedRole ? { cursor: "pointer" } : { cursor: "no-drop", opacity: "0.5" }}
                                           onClick={() => {
                                              if (selectedRole) {
-                                                setSelectedFromTagged((prev) => (prev.includes(item.type) ? prev.filter((type) => type !== item.type) : [...prev, item.type]));
+                                                const selectedTasks = availableTaskForRole.filter((item) => selectedfromAvailable.includes(item.type));
+                                                setTaggedTask((prev) => [...prev, ...selectedTasks]);
+                                                setAvaiableTaskForRole((prev) => prev.filter((item) => !selectedfromAvailable.includes(item.type)));
+                                                setSelectedFromAvailable([]);
                                              }
                                           }}
-                                       >
-                                          {item.typeDesc || item.type}
-                                       </MenuItem>
-                                    ))}
+                                       />
+                                       <KeyboardDoubleArrowRightIcon
+                                          style={selectedRole ? { cursor: "pointer" } : { cursor: "no-drop", opacity: "0.5" }}
+                                          onClick={() => {
+                                             if (selectedRole) {
+                                                setTaggedTask(taskList);
+                                                setAvaiableTaskForRole([]);
+                                             }
+                                          }}
+                                       />
+                                       <KeyboardDoubleArrowLeftIcon
+                                          style={selectedRole ? { cursor: "pointer" } : { cursor: "no-drop", opacity: "0.5" }}
+                                          onClick={() => {
+                                             if (selectedRole) {
+                                                setAvaiableTaskForRole(taskList);
+                                                setTaggedTask([]);
+                                             }
+                                          }}
+                                       />
+                                       <KeyboardArrowLeftIcon
+                                          style={selectedRole ? { cursor: "pointer" } : { cursor: "no-drop", opacity: "0.5" }}
+                                          onClick={() => {
+                                             if (selectedRole) {
+                                                // Move selected from tagged to available
+                                                const selectedTasks = TaggedTask.filter((item) => selectedfromtagged.includes(item.type));
+                                                setAvaiableTaskForRole((prev) => [...prev, ...selectedTasks]);
+                                                setTaggedTask((prev) => prev.filter((item) => !selectedfromtagged.includes(item.type)));
+                                                setSelectedFromTagged([]);
+                                             }
+                                          }}
+                                       />
+                                    </div>
+                                    <div className="item-area">
+                                       <div>Selected Task</div>
+                                       <div className="selected-task">
+                                          {TaggedTask.map((item, idx) => (
+                                             <MenuItem
+                                                key={idx}
+                                                className={`available-item ${selectedfromtagged.includes(item.type) ? "selected-item" : ""}`}
+                                                onDoubleClick={() => {
+                                                   if (selectedRole) {
+                                                      setAvaiableTaskForRole((prev) => [...prev, item]);
+                                                      setTaggedTask((prev) => prev.filter((t) => t.type !== item.type));
+                                                   }
+                                                }}
+                                                onClick={() => {
+                                                   if (selectedRole) {
+                                                      setSelectedFromTagged((prev) =>
+                                                         prev.includes(item.type) ? prev.filter((type) => type !== item.type) : [...prev, item.type]
+                                                      );
+                                                   }
+                                                }}
+                                             >
+                                                {item.typeDesc || item.type}
+                                             </MenuItem>
+                                          ))}
+                                       </div>
+                                    </div>
+                                 </div>
+                                 <div className="button-area">
+                                    <Button variant="contained" onClick={handleRoleTask}>
+                                       Update
+                                    </Button>
+                                    <Button variant="outlined">Cancle</Button>
                                  </div>
                               </div>
-                           </div>
-                           <div className="button-area">
-                              <Button variant="contained" onClick={handleRoleTask}>
-                                 Update
-                              </Button>
-                              <Button variant="outlined">Cancle</Button>
-                           </div>
-                        </div>
+                           </>
+                        )}
                      </FormControl>
                   </AccordionDetails>
                </Accordion>
@@ -533,7 +575,7 @@ const User = () => {
                            name="roleCd"
                            onChange={(e) => {
                               handleFormChange(e);
-                              if (newRole.roleCd.length || e.target.value != "") {
+                              if (newRole.roleCd.length != 0 || e.target.value != "") {
                                  handleverifyRoleCd(e);
                               }
                            }}
@@ -589,11 +631,36 @@ const User = () => {
                      </div>
                   </div>
                )}
-               {modalType == "Delete" && <div className="delete-role-main">
-                  
-                  
-                  
-                  </div>}
+               {modalType == "Delete" && (
+                  <>
+                     <div>
+                        <div className="delete-role-main">
+                          
+                           {roleUserMap[0].roleCd == '' ? (
+                               <div className="delete-role-loading">
+                              <Loading message="Loading Roles..." show />
+                              </div>
+                           ) :( roleUserMap.map((item, index) => {
+                              const isDisabled = (item?.userIds || []).length > 0;
+                              const labelText = `${item.roleName}${item.userIds?.length ? " - (" + item.userIds.toString() + ")" : ""}`;
+                              const tooltipText = "Role should not be assigned to any users to be deleted";
+                              return (
+                                 <Tooltip key={index} title={tooltipText} disableHoverListener={!isDisabled}>
+                                    <span className="user-role-map">
+                                       <FormControlLabel label={labelText} name={item.roleName} control={<Checkbox value={item.roleCd} onChange={handleDeleteRoleSelect} disabled={isDisabled} />} />
+                                       <hr></hr>
+                                    </span>
+                                 </Tooltip>
+                              );
+                           }))}
+                        </div>
+                        <div className="del-btn-area">
+                           <Button variant="contained" color="error" onClick={deleteRole}> Delete</Button>
+                           <Button variant="outlined" color="secondary" onClick={() =>setOpen(false)}> close</Button>
+                        </div>
+                     </div>
+                  </>
+               )}
             </Box>
          </Modal>
       </>

@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gatewayapi.Model.AuthRequest;
-import com.gatewayapi.Model.Users;
 import com.gatewayapi.Model.userprofileDto;
 import com.gatewayapi.Service.UserService;
 import com.gatewayapi.jwtUtils.JwtService;
@@ -42,11 +41,20 @@ public class UserController {
 	
 	@Autowired
 	private JwtService jwt;
+
 	
 	@PostMapping("/register")
 	public String register(@RequestBody userprofileDto user) {		
-		return service.register(user);
+		try {
+			return service.register(user);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
+	
+	
 
 	@PostMapping("/login")
 	public Mono<ResponseEntity<String>> login(@RequestBody AuthRequest authReq,ServerHttpResponse response){
@@ -60,7 +68,7 @@ public class UserController {
 	            String token = jwt.generateToken(auth.getName(),roles);
 	            ResponseCookie cookie = ResponseCookie.from("JWT-Token", token)
 	                    .httpOnly(true)
-	                    .secure(false)
+	                    .secure(true)
 	                    .path("/")
 	                    .sameSite("Lax")
 	                    .maxAge(Duration.ofMinutes(30))
@@ -87,6 +95,9 @@ public class UserController {
 	        }
 	    }).onErrorResume(ex -> {
 	        log.error("Authentication error", ex);
+	        if(ex.getMessage().equalsIgnoreCase("Please Validate the Email to login")) {
+	        	 return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email validation Failed"));
+	        }
 	        return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed"));
 	    });	
 	}
@@ -95,7 +106,7 @@ public class UserController {
 	public Mono<Void> logout(ServerHttpResponse response){
 		  ResponseCookie cookie = ResponseCookie.from("JWT-Token", "")
 		            .httpOnly(true)
-		            .secure(false)
+		            .secure(true)
 		            .path("/")
 		            .maxAge(0)
 		            .build();
@@ -106,8 +117,14 @@ public class UserController {
 	
 	@PostMapping("/verifyUserId")
 	public Mono<String> verifyUser(@RequestBody String userId){
-		log.info("userId :: {}",userId);
+//		log.info("userId :: {}",userId);
 		return service.verifyUserId(userId);
 	}
+	
+	@PostMapping("/verifyEmail")
+	public Mono<String> verifyEmail(@RequestBody String email){
+		return service.verifyEmail(email);
+	}
+	
 
 }

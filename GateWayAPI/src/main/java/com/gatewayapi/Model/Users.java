@@ -20,6 +20,7 @@ public class Users {
 //	private String email;
 	private List<String> roles;
 	private String password;
+	private int emailVerificationIn;
 	
 	public void setRoleList(String roleList) {
 		this.roles = Arrays.stream(roleList.split(","))

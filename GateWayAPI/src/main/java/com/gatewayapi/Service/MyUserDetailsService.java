@@ -32,6 +32,9 @@ public class MyUserDetailsService implements ReactiveUserDetailsService{
 			if(user==null){
 				throw new UsernameNotFoundException("User Not Found in DB");
 			}
+			if(user.getEmailVerificationIn()==0) {
+				throw new Exception("Please Validate the Email to login");
+			}
 			UserDetails ud=new UserPrincipal(user);
 			return ud;
 		}).subscribeOn(Schedulers.boundedElastic());

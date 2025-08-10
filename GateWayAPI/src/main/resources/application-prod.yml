@@ -24,7 +24,7 @@ spring:
             - name: Retry
               args:
                retries: 3
-               statuses: BAD_GATEWAY
+               statuses: BAD_GATEWAY, TOO_MANY_REQUESTS
                methods: GET, POST
                backoff:
                 firstBackoff: 2s
