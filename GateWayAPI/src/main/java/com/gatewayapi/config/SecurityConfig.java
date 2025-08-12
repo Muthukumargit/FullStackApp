@@ -21,6 +21,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
+import com.gatewayapi.filter.EmailVerificationFilter;
 import com.gatewayapi.filter.JwtFilter;
 
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,9 @@ public class SecurityConfig {
 	@Autowired
 	private JwtFilter jwtFilter;
 	
+	@Autowired
+	private EmailVerificationFilter emailVerificationFilter;
+	
 	@Bean
 	public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
 		return http 
@@ -43,7 +47,7 @@ public class SecurityConfig {
 				.formLogin(formLogin -> formLogin.disable())
 				.csrf(csrf -> csrf.disable())
 				   .authorizeExchange(exchange -> exchange
-						   .pathMatchers("/register","/login","/logout","/verifyUserId","/UI/**")
+						   .pathMatchers("/register","/login","/logout","/verifyUserId","/verifyEmail","/emailVerification","/UI/**")
 						   .permitAll()
 						   .anyExchange().authenticated()
 				   )
@@ -57,6 +61,7 @@ public class SecurityConfig {
            )
 				   .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
 				   .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+				   .addFilterAt(emailVerificationFilter, SecurityWebFiltersOrder.AUTHENTICATION)
 				   .build();
 		
 	}

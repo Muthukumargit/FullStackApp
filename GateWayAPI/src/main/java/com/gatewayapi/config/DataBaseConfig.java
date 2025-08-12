@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import com.cipher.CipherUtils;
+
 @Configuration
 public class DataBaseConfig {
 	
@@ -24,5 +26,10 @@ public class DataBaseConfig {
 	public JdbcTemplate oracleTemplate() {		
 		return new JdbcTemplate(getOracleDataSource());
 	}
+	
+	  @Bean
+	    public CipherUtils cipherUtils() {
+	        return new CipherUtils();
+	    }
 
 }

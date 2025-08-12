@@ -1,18 +1,28 @@
- # Use a stable, lightweight JDK 17 image
-FROM eclipse-temurin:17-jdk-alpine
+# Stage 1: Build the application using Maven
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 
-# Set environment variables
-#ENV APP_HOME=/app
 WORKDIR /app
 
-# Copy the built JAR file into the image
-COPY target/*.jar app.jar
+# Copy pom.xml and download dependencies first
+COPY pom.xml .
+RUN mvn dependency:go-offline
 
-# Expose the port your Spring Boot app listens on
+# Copy the full source code
+COPY src ./src
+
+# Build the project
+RUN mvn clean install -DskipTests
+
+# Stage 2: Run the application using lightweight JDK
+FROM eclipse-temurin:17-jdk-alpine
+
+WORKDIR /app
+
+# ✅ FIX: Copy the jar from the build stage
+COPY --from=build /app/target/*.jar app.jar
+
 EXPOSE 20000
 
-# Default ENTRYPOINT (fixed command)
 ENTRYPOINT ["java", "-jar", "app.jar"]
 
-# Default CMD arguments (can be overridden at runtime)
 CMD ["--spring.profiles.active=prod"]
